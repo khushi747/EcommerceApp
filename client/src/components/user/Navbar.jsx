@@ -1,113 +1,72 @@
-import { ShoppingCart, PackageCheck } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useUserDetails } from "../../context/user/UserDetailsContext";
-import { useNavigate } from "react-router-dom";
+
 const Navbar = () => {
-  const { isUserLoggedIn, setIsUserLoggedIn, isAdmin, setIsAdmin } =
-    useUserDetails();
+  const { isUserLoggedIn, isAdmin, user, logout } = useUserDetails();
   const navigate = useNavigate();
 
-  const handleAdminStoreClick = () => {
-    if (isAdmin) {
-      navigate("/admin");
-    } else {
-      alert("You are not authorized to access the admin store.");
-    }
-  };
-
-  const handleCartClick = () => {
-    navigate("/cart");
-  };
-
-  const handleMyOrdersClick = () => {
-    if (isUserLoggedIn) {
-      navigate("/orders");
-    } else {
-      alert("Please log in to view your orders.");
-    }
-  };
-
-  const handleSignUpClick = () => {
-    navigate("/user/signup");
-  };
-
-  const handleProfileClick = () => {
-    navigate("/profile");
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
   };
 
   return (
-    <nav>
-      <div className="navbar bg-base-100 shadow-sm !sticky top-0 z-50">
-        <div className="navbar-start">
-          <div className="dropdown">
-            <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+    <nav className="bg-blue-600 text-white p-4">
+      <div className="container mx-auto flex justify-between items-center">
+        <Link to="/" className="text-xl font-bold">
+          E-Commerce App
+        </Link>
+
+        <div className="flex items-center space-x-4">
+          {!isUserLoggedIn ? (
+            <>
+              <Link to="/login" className="hover:underline">
+                Login
+              </Link>
+              <Link to="/signup" className="hover:underline">
+                Sign Up
+              </Link>
+            </>
+          ) : (
+            <>
+              <span>Welcome, {user?.name}!</span>
+
+              {isAdmin ? (
+                <>
+                  <Link to="/admin" className="hover:underline">
+                    Dashboard
+                  </Link>
+                  <Link to="/admin/add-item" className="hover:underline">
+                    Add Item
+                  </Link>
+                  <Link to="/admin/profile" className="hover:underline">
+                    Profile
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/user" className="hover:underline">
+                    Home
+                  </Link>
+                  <Link to="/user/cart" className="hover:underline">
+                    Cart
+                  </Link>
+                  <Link to="/user/orders" className="hover:underline">
+                    Orders
+                  </Link>
+                  <Link to="/user/profile" className="hover:underline">
+                    Profile
+                  </Link>
+                </>
+              )}
+
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
               >
-                {" "}
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h8m-8 6h16"
-                />{" "}
-              </svg>
-            </div>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
-            >
-              <li>
-                <a>Item 1</a>
-              </li>
-
-              <li>
-                <a>Item 3</a>
-              </li>
-            </ul>
-          </div>
-          <a
-            className="btn btn-ghost text-xl"
-            onClick={() => handleAdminStoreClick()}
-          >
-            Admin Store
-          </a>
-        </div>
-
-        <div className="flex gap-4 navbar-end">
-          <div className="cursor-pointer" onClick={() => handleCartClick()}>
-            <a className="btn">
-              <ShoppingCart />
-            </a>
-          </div>
-
-          {isUserLoggedIn && (
-            <div
-              className="cursor-pointer"
-              onClick={() => handleMyOrdersClick()}
-            >
-              <a className="btn">
-                <PackageCheck />
-              </a>
-            </div>
-          )}
-          {!isUserLoggedIn && (
-            <div
-              className="  cursor-pointer"
-              onClick={() => handleSignUpClick()}
-            >
-              <a className="btn">SignUp</a>
-            </div>
-          )}
-          {isUserLoggedIn && (
-            <div className="avatar" onClick={() => handleProfileClick()}>
-              <div className="w-10 rounded-full">
-                <img src="https://img.daisyui.com/images/profile/demo/yellingcat@192.webp" />
-              </div>
-            </div>
+                Logout
+              </button>
+            </>
           )}
         </div>
       </div>

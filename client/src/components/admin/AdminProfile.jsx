@@ -1,8 +1,9 @@
 import React from "react";
-import Navbar from "../Navbar";
-
-const ProfilePage = () => {
-  // Mock admin/seller data – in real app, fetch this from your API
+import { useUserDetails } from "../../context/user/UserDetailsContext";
+import { backendUrl } from "../../shared";
+const AdminProfile = () => {
+  const { isUserLoggedIn, isAdmin, setIsUserLoggedIn, setIsAdmin } =
+    useUserDetails();
   const admin = {
     name: "John Doe",
     email: "admin@example.com",
@@ -12,6 +13,26 @@ const ProfilePage = () => {
     joined: "2023-01-15",
     profileImage:
       "https://img.daisyui.com/images/profile/demo/yellingcat@192.webp",
+  };
+
+  const handleLogoutClick = () => {
+    // Logic for logging out the user
+    fetch(`${backendUrl}logoutUser`, {
+      method: "GET",
+      credentials: "include", // Include cookies in the request
+    })
+      .then((response) => {
+        if (response.ok) {
+          setIsUserLoggedIn(false);
+          setIsAdmin(false);
+          console.log("User logged out");
+        } else {
+          console.error("Logout failed");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
 
   return (
@@ -48,10 +69,13 @@ const ProfilePage = () => {
               {admin.joined}
             </p>
           </div>
+          <div className="  cursor-pointer" onClick={() => handleLogoutClick()}>
+            <a className="btn">Log out</a>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default ProfilePage;
+export default AdminProfile;

@@ -1,7 +1,13 @@
+import ItemCard from "./ItemCard";
 const UserDashboard = () => {
   return (
-    <div>
-      <h1>User Dashboard</h1>
+    <div className="flex flex-wrap justify-center gap-6 p-6">
+      <ItemCard /> 
+      <ItemCard />
+      <ItemCard />
+      <ItemCard />
+      <ItemCard />
+      <ItemCard />
     </div>
   );
 };
