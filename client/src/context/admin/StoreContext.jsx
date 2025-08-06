@@ -1,18 +1,13 @@
 import React from "react";
 import { createContext, useState, useContext } from "react";
- // 1. Create the context
 const StoreContext = createContext();
  
 export const StoreProvider = ({ children }) => {
-  const [isStoreOpen, setIsStoreOpen] = useState(false);
+  const [productsInMyInventory, setProductsInMyInventory] = useState([]);
 
-  const toggleStore = () => {
-    setIsStoreOpen((prev) => !prev);
-    navigate("/admin");
-  };
-
+  
   return (
-    <StoreContext.Provider value={{ isStoreOpen, setIsStoreOpen, toggleStore }}>
+    <StoreContext.Provider value={{ productsInMyInventory, setProductsInMyInventory }}>
       {children}
     </StoreContext.Provider>
   );

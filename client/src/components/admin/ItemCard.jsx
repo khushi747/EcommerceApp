@@ -1,29 +1,32 @@
-import { Plus, Minus } from "lucide-react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const ItemCard = () => {
+const ItemCard = ({ product }) => {
+  const { name, price, quantity, imageUrl, _id } = product;
+  const navigate = useNavigate();
+  const handleEdit = (_id) => {
+    navigate(`/admin/edit-product/${_id}`);
+  };
   return (
-    <div className="card bg-base-100 w-70 shadow-sm">
-      <figure>
-        <img
-          src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-          alt="Shoes"
-        />
+    <div className="card bg-base-100   w-70 shadow-sm">
+      <figure className="h-48">
+        <img src={imageUrl} alt={name} className="object-cover w-full h-full" />
       </figure>
-      <div className="card-body">
-        <h2 className="card-title">Nike Shoes</h2>
-        <p>
-          A card component has a figure, a body part, and inside body there are
-          title and actions parts
-        </p>
-        <div className="card-actions flex justify-between items-center ">
-          {" "}
-          <button className="btn btn-primary bg-black border-3px-solid border-black">
-            <Minus />
-          </button>
-          <h2 className="text-lg font-bold"> X {10} Units</h2>
-          <button className="btn btn-primary bg-black border-3px-solid border-black">
-            <Plus />
-          </button>
+      <div className="card-body h-30 p-2">
+        <h2 className="card-title">{name}</h2>
+        {/* <p className="overflow-hidden">{description}</p>{" "} */}
+        <div className="flex justify-between items-center">
+          <div className="card-actions flex flex-col justify-between  ">
+            {" "}
+            <h2 className="text-lg  ">{quantity} Units</h2>
+            <h2 className="text-lg "> Rs.{price}/Unit </h2>
+          </div>
+          <div>
+            {" "}
+            <button className="btn bg-gray-200" onClick={() => handleEdit(_id)}>
+              Edit
+            </button>
+          </div>
         </div>
       </div>
     </div>

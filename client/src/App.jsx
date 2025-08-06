@@ -11,57 +11,72 @@ import Login from "../src/components/user/Login.jsx";
 import Signup from "../src/components/user/Signup.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import StoreContent from "./components/admin/StoreContent.jsx";
+import EditProduct from "./components/admin/EditProduct.jsx";
+import DetailedItemCard from "./components/user/DetailedItemCard.jsx";
 import { UserDetailsProvider } from "./context/user/UserDetailsContext.jsx";
+import { ProductsProvider } from "./context/user/ProductsContext.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
     <UserDetailsProvider>
-      <BrowserRouter>
-        <ToastContainer position="top-right" autoClose={3000} />
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<UserLayout />}>
-            <Route index element={<UserDashboard />} />
-            <Route path="login" element={<Login />} />
-            <Route path="signup" element={<Signup />} />
-          </Route>
+      <ProductsProvider>
+        <BrowserRouter>
+          <ToastContainer position="top-right" autoClose={2000} />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<UserLayout />}>
+              <Route index element={<UserDashboard />} />
+              <Route
+                path="product/:product_id"
+                element={<DetailedItemCard />}
+              />
+              <Route path="cart" element={<Cart />} />
+              <Route path="login" element={<Login />} />
+              <Route path="signup" element={<Signup />} />
+            </Route>
 
-          {/* Protected Admin Routes */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<AdminDashboard />} />
-            <Route path="inventory" element={<StoreContent />} />
-            <Route path="add-item" element={<AddItemPage />} />
-            <Route path="profile" element={<AdminProfile />} />
-          </Route>
+            {/* Protected Admin Routes */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<AdminDashboard />} />
+              <Route path="inventory" element={<StoreContent />} />
+              <Route path="add-item" element={<AddItemPage />} />
+              <Route path="profile" element={<AdminProfile />} />
+              <Route path="edit-product/:id" element={<EditProduct />} />
+            </Route>
 
-          {/* Protected User Routes */}
-          <Route
-            path="/user"
-            element={
-              <ProtectedRoute requiredRole="user">
-                <UserLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<UserDashboard />} />
-            <Route path="profile" element={<UserProfile />} />
-            <Route path="cart" element={<Cart />} />
-            <Route path="orders" element={<Cart />} />
-          </Route>
+            {/* Protected User Routes */}
+            <Route
+              path="/user"
+              element={
+                <ProtectedRoute requiredRole="user">
+                  <UserLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<UserDashboard />} />
+              <Route path="profile" element={<UserProfile />} />
+              <Route path="cart" element={<Cart />} />
+              <Route path="orders" element={<Cart />} />
+              <Route
+                path="product/:product_id"
+                element={<DetailedItemCard />}
+              />
+            </Route>
 
-          {/* Catch all - redirect to home */}
-          <Route path="*" element={<UserLayout />} />
-        </Routes>
-      </BrowserRouter>
+            {/* Catch all - redirect to home */}
+            <Route path="*" element={<UserLayout />} />
+          </Routes>
+        </BrowserRouter>
+      </ProductsProvider>
     </UserDetailsProvider>
   );
 }

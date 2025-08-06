@@ -20,6 +20,9 @@ const Navbar = () => {
         <div className="flex items-center space-x-4">
           {!isUserLoggedIn ? (
             <>
+              <Link to="/cart" className="hover:underline">
+                Cart
+              </Link>
               <Link to="/login" className="hover:underline">
                 Login
               </Link>

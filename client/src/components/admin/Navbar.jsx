@@ -103,7 +103,7 @@ const Navbar = () => {
         <Link to="/" className="text-xl font-bold">
           E-Commerce App
         </Link>
-
+        
         <div className="flex items-center space-x-4">
           {!isUserLoggedIn ? (
             <>

@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const checkForAuth = require("./middlewares/auth");
 const userModel = require("./models/user");
+const ProductModel = require("./models/products");
 const dotenv = require("dotenv");
 const app = express();
 
@@ -128,6 +129,189 @@ app.get("/user", checkForAuth, (req, res) => {
     return res.status(403).json({ message: "Access denied: Not a user" });
   }
   res.send("User route accessed by user");
+});
+
+// USER ROUTES
+app.get("/getProducts", async (req, res) => {
+  try {
+    const products = await ProductModel.find();
+    // console.log("Fetched products:", products);
+    res.status(200).json({ products });
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/product/:id", async (req, res) => {
+  try {
+    const product = await ProductModel.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    const { name, price, quantity, imageUrl, description, category } = product;
+    const productDetails = {
+      name,
+      price,
+      quantity,
+      imageUrl,
+      description,
+      category,
+      seller: product.seller,
+      _id: product._id,
+    };
+    console.log("Product details fetched:", productDetails);
+    res.status(200).json({ product: productDetails });
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.post("/saveCart", checkForAuth, async (req, res) => {
+  try {
+    const { cart } = req.body;
+
+    // Save cart to user's document in the database
+    const user = await userModel.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.cart = cart;
+    await user.save();
+
+    res.status(200).json({ message: "Cart saved successfully" });
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// ADMIN ROUTES
+app.get("/getProductDetails/:id", checkForAuth, async (req, res) => {
+  try {
+    const product = await ProductModel.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    const { name, price, quantity, imageUrl, description, category } = product;
+    const productDetails = {
+      name,
+      price,
+      quantity,
+      imageUrl,
+      description,
+      category,
+      seller: product.seller,
+      _id: product._id,
+    };
+    res.status(200).json({
+      product: productDetails,
+    });
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/getProductsInMyInventory", checkForAuth, async (req, res) => {
+  try {
+    // console.log("Fetching products for user:", req.user.userId);
+    const products = await ProductModel.find({ seller: req.user.userId });
+    res.status(200).json({ products });
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.put("/updateProductDetails/:id", checkForAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, price, quantity, description, category, imageUrl } = req.body;
+
+    // Validate required fields
+    if (!name || !price || !description || !category) {
+      return res.status(400).json({
+        message: "Missing required fields: name, price, description, category",
+      });
+    }
+
+    const updatedProduct = await ProductModel.findByIdAndUpdate(
+      id,
+      {
+        name,
+        price: Number(price),
+        quantity: Number(quantity) || 0,
+        description,
+        category,
+        imageUrl,
+      },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json({
+      message: "Product updated successfully",
+      product: updatedProduct,
+    });
+  } catch (err) {
+    console.error("Error updating product:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.post("/addNewProduct", checkForAuth, async (req, res) => {
+  try {
+    if (req.user.role !== "seller") {
+      return res.status(403).json({ message: "Access denied: Not a seller" });
+    }
+    const { name, price, quantity, description, category, imageUrl } = req.body;
+
+    // Validate required fields
+    if (!name || !price || !description || !category) {
+      return res.status(400).json({
+        message: "Missing required fields: name, price, description, category",
+      });
+    }
+    // Create product with proper field mapping
+    const productData = {
+      name,
+      price: Number(price),
+      quantity: Number(quantity) || 0,
+      description,
+      category,
+      imageUrl,
+      seller: req.user.userId,
+    };
+    // console.log("Creating product with data:", productData);
+
+    const newProduct = await ProductModel.create(productData);
+    // console.log("New product added:", newProduct);
+    res
+      .status(201)
+      .json({ message: "Product added successfully", product: newProduct });
+  } catch (err) {
+    console.error("Error adding product:", err);
+
+    // Send detailed error for development
+    if (err.name === "ValidationError") {
+      const errors = Object.values(err.errors).map((e) => e.message);
+      return res.status(400).json({
+        message: "Validation error",
+        errors: errors,
+      });
+    }
+
+    res.status(500).json({
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  }
 });
 
 app.listen(PORT, () => {

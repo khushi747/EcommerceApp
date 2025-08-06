@@ -62,8 +62,9 @@ export const UserDetailsProvider = ({ children }) => {
       setIsUserLoggedIn(false);
       setIsAdmin(false);
       setUser(null);
-      localStorage.removeItem("token"); // Clean up localStorage too
-      setLoading(false); // Now safe to render
+      localStorage.removeItem("cart");
+      localStorage.removeItem("token");
+      setLoading(false);
     }
   };
 

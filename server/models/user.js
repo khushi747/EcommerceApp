@@ -9,6 +9,14 @@ const userSchema = new mongoose.Schema({
     enum: ["user", "seller"],
     required: true,
   },
+  cart: [
+    {
+      productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+      quantity: { type: Number, default: 1 },
+    },
+  ],
+  city: String,
+  phone: String,
 });
 
 const User = mongoose.model("User", userSchema);

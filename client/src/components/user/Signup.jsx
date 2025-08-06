@@ -9,6 +9,7 @@ const Signup = () => {
     email: "",
     password: "",
     role: "",
+    cart: [],
   });
 
   const handleChange = (e) => {
